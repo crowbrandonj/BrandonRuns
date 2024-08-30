@@ -68,11 +68,17 @@
     </div>
 
     <script>
-        const clientId = '97e08c2a6e8d4219833b9d913ae47f48';
-        const clientSecret = '75b1d61b460f408297391c8ea1971253';
-        const redirectUri = 'https://crowbrandonj.github.io/BrandonRuns/callback'; // Update to your actual redirect URI
-        const scope = 'user-read-playback-state';
-        const authUrl = `https://accounts.spotify.com/authorize?client_id=${clientId}&response_type=code&redirect_uri=${encodeURIComponent(redirectUri)}&scope=${encodeURIComponent(scope)}`;
+    const clientId = '97e08c2a6e8d4219833b9d913ae47f48';
+    const clientSecret = '75b1d61b460f408297391c8ea1971253';
+    const redirectUri = 'https://crowbrandonj.github.io/BrandonRuns/callback'; // Properly set redirect URI
+    const scope = 'user-read-playback-state';
+    const authUrl = `https://accounts.spotify.com/authorize?client_id=${clientId}&response_type=code&redirect_uri=${encodeURIComponent(redirectUri)}&scope=${encodeURIComponent(scope)}`;
+
+    document.getElementById('login-button').addEventListener('click', () => {
+        window.location.href = authUrl;
+    });
+</script>
+
 
         document.getElementById('login-button').addEventListener('click', () => {
             window.location.href = authUrl;
