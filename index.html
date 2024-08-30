@@ -43,6 +43,9 @@
         #track-info p {
             margin: 5px 0;
         }
+        #playback-controls {
+            margin-top: 10px;
+        }
     </style>
 </head>
 <body>
@@ -65,19 +68,16 @@
     </div>
 
     <script>
-        // Spotify credentials and configuration
         const clientId = '97e08c2a6e8d4219833b9d913ae47f48';
         const clientSecret = '75b1d61b460f408297391c8ea1971253';
-        const redirectUri = 'http://localhost:8888/callback'; // Change this to your actual redirect URI
+        const redirectUri = 'http://localhost:8888/callback'; // Update to your actual redirect URI
         const scope = 'user-read-playback-state';
         const authUrl = `https://accounts.spotify.com/authorize?client_id=${clientId}&response_type=code&redirect_uri=${encodeURIComponent(redirectUri)}&scope=${encodeURIComponent(scope)}`;
 
-        // Redirect to Spotify login
         document.getElementById('login-button').addEventListener('click', () => {
             window.location.href = authUrl;
         });
 
-        // Check for authorization code in URL and fetch access token
         function getAccessToken() {
             const urlParams = new URLSearchParams(window.location.search);
             const code = urlParams.get('code');
@@ -98,5 +98,53 @@
                 .then(response => response.json())
                 .then(data => {
                     const accessToken = data.access_token;
-               
+                    localStorage.setItem('access_token', accessToken);
+                    fetchNowPlaying(accessToken);
+                });
+            }
+        }
 
+        function fetchNowPlaying(accessToken) {
+            fetch('https://api.spotify.com/v1/me/player/currently-playing', {
+                headers: {
+                    'Authorization': `Bearer ${accessToken}`
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data && data.item) {
+                    document.getElementById('track-info').innerHTML = `
+                        <h2>Now Playing</h2>
+                        <img src="${data.item.album.images[0].url}" alt="${data.item.name}" width="100">
+                        <p><strong>${data.item.name}</strong> by ${data.item.artists.map(artist => artist.name).join(', ')}</p>
+                        <p>Album: ${data.item.album.name}</p>
+                        <div id="playback-controls">
+                            <button onclick="sendPlaybackCommand('previous')">Previous</button>
+                            <button onclick="sendPlaybackCommand('play')">Play</button>
+                            <button onclick="sendPlaybackCommand('pause')">Pause</button>
+                            <button onclick="sendPlaybackCommand('next')">Next</button>
+                        </div>
+                    `;
+                } else {
+                    document.getElementById('track-info').innerHTML = '<p>No track playing right now.</p>';
+                }
+            });
+        }
+
+        function sendPlaybackCommand(command) {
+            const accessToken = localStorage.getItem('access_token');
+
+            fetch(`https://api.spotify.com/v1/me/player/${command}`, {
+                method: 'POST',
+                headers: {
+                    'Authorization': `Bearer ${accessToken}`,
+                    'Content-Type': 'application/json'
+                }
+            });
+        }
+
+        // Run on page load if code is present in URL
+        getAccessToken();
+    </script>
+</body>
+</html>
