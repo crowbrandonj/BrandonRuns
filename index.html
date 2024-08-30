@@ -3,66 +3,66 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Go Brandon Go</title>
+    <title>Spotify Player Widget</title>
     <style>
         body {
             font-family: Arial, sans-serif;
             text-align: center;
-            padding: 20px;
-            margin: 0;
+            margin: 20px;
         }
-        .container {
-            max-width: 800px;
-            margin: 0 auto;
+
+        #spotify-player {
+            margin: 20px auto;
+            max-width: 350px;
         }
-        .video-container {
-            margin: 20px 0;
-        }
-        iframe {
-            width: 100%;
-            height: 315px;
-            border: none;
-        }
-        #track-info {
-            margin: 20px 0;
-            padding: 15px;
-            border: 1px solid #ddd;
-            border-radius: 8px;
-            background-color: #f9f9f9;
-            display: inline-block;
-            max-width: 300px;
-            text-align: left;
-        }
-        #track-info img {
-            border-radius: 5px;
-            margin-right: 15px;
-        }
-        #track-info h2 {
-            margin: 0;
-        }
-        #track-info p {
-            margin: 5px 0;
-        }
-        #playback-controls {
-            margin-top: 10px;
+
+        button {
+            padding: 10px 20px;
+            font-size: 16px;
+            cursor: pointer;
         }
     </style>
 </head>
 <body>
-    <div class="container">
-        <h1>Go Brandon Go</h1>
-        <p>Welcome to Go Brandon Go! I would like to document my journey to running my first half marathon! I will be running in the OUC Orlando Half Marathon race on December 7th. I plan on livestreaming this event so that you can follow me along and cheer me on from wherever you are! Still ironing out the logistics. In the meantime, I will be uploading my long runs in the weeks leading up to the race. Thank you for your support!</p>
-
-        <!-- Embedded YouTube video -->
-        <div class="video-container">
-            <iframe width="560" height="315" src="https://www.youtube.com/embed/P52StUox2bQ?si=sg-0u2AeZeRZghGT" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
-        </div>
-
-        <!-- Spotify Playlist Embed -->
-        <div id="track-info">
-            <p>Listen to my playlist on Spotify:</p>
-            <iframe src="https://open.spotify.com/embed/playlist/1EIF0sidfIiRLC9NZQ5Zya" width="300" height="380" frameborder="0" allowtransparency="true" allow="encrypted-media"></iframe>
+    <h1>Spotify Player Widget</h1>
+    <div id="spotify-player">
+        <button id="login">Login with Spotify</button>
+        <div id="player-container" style="display:none;">
+            <iframe id="spotify-iframe" src="" width="300" height="380" frameborder="0" allowtransparency="true" allow="encrypted-media"></iframe>
         </div>
     </div>
+    <script src="https://sdk.scdn.co/spotify-player.js"></script>
+    <script>
+        const CLIENT_ID = '97e08c2a6e8d4219833b9d913ae47f48'; // Your Spotify Client ID
+        const REDIRECT_URI = 'https://crowbrandonj.github.io/BrandonRuns/callback'; // Your Redirect URI
+
+        const AUTH_URL = 'https://accounts.spotify.com/authorize?' +
+            'response_type=token' +
+            '&client_id=' + CLIENT_ID +
+            '&scope=user-read-playback-state user-read-currently-playing' +
+            '&redirect_uri=' + encodeURIComponent(REDIRECT_URI);
+
+        document.getElementById('login').addEventListener('click', () => {
+            window.location.href = AUTH_URL;
+        });
+
+        window.addEventListener('load', () => {
+            const hash = window.location.hash.substring(1).split('&').reduce((initial, item) => {
+                if (item) {
+                    const parts = item.split('=');
+                    initial[parts[0]] = decodeURIComponent(parts[1]);
+                }
+                return initial;
+            }, {});
+
+            const access_token = hash.access_token;
+
+            if (access_token) {
+                document.getElementById('player-container').style.display = 'block';
+                const iframe = document.getElementById('spotify-iframe');
+                iframe.src = `https://open.spotify.com/embed/track/4uLU6hMCjMI75M1A2tKUQC`; // Example track
+            }
+        });
+    </script>
 </body>
 </html>
