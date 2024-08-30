@@ -30,7 +30,7 @@
             border-radius: 8px;
             background-color: #f9f9f9;
             display: inline-block;
-            max-width: 400px;
+            max-width: 300px;
             text-align: left;
         }
         #track-info img {
@@ -58,71 +58,11 @@
             <iframe width="560" height="315" src="https://www.youtube.com/embed/P52StUox2bQ?si=sg-0u2AeZeRZghGT" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
         </div>
 
-        <!-- Spotify Now Playing Widget -->
+        <!-- Spotify Playlist Embed -->
         <div id="track-info">
-            <p>Loading Spotify track...</p>
+            <p>Listen to my playlist on Spotify:</p>
+            <iframe src="https://open.spotify.com/embed/playlist/1EIF0sidfIiRLC9NZQ5Zya" width="300" height="380" frameborder="0" allowtransparency="true" allow="encrypted-media"></iframe>
         </div>
-
-        <!-- Playback Controls -->
-        <div id="playback-controls">
-            <button onclick="play()">Play</button>
-            <button onclick="pause()">Pause</button>
-        </div>
-
     </div>
-
-    <!-- Include the Spotify Web Playback SDK -->
-    <script src="https://sdk.scdn.co/spotify-player.js"></script>
-    <script>
-        // Spotify Web Playback SDK initialization
-        window.onSpotifyWebPlaybackSDKReady = () => {
-            const token = 'YOUR_ACCESS_TOKEN'; // Replace with your Spotify access token
-
-            const player = new Spotify.Player({
-                name: 'Go Brandon Go Player',
-                getOAuthToken: cb => { cb(token); }
-            });
-
-            // Error handling
-            player.addListener('initialization_error', ({ message }) => console.error(message));
-            player.addListener('authentication_error', ({ message }) => console.error(message));
-            player.addListener('account_error', ({ message }) => console.error(message));
-            player.addListener('playback_error', ({ message }) => console.error(message));
-
-            // Playback status updates
-            player.addListener('player_state_changed', state => {
-                if (!state || !state.track_window || !state.track_window.current_track) {
-                    document.querySelector('#track-info').innerHTML = '<p>Not Playing</p>';
-                    return;
-                }
-
-                const { current_track } = state.track_window;
-                document.querySelector('#track-info').innerHTML = `
-                    <h2>${current_track.name}</h2>
-                    <p>by ${current_track.artists.map(artist => artist.name).join(', ')}</p>
-                    <img src="${current_track.album.images[0].url}" alt="${current_track.name}" width="100">
-                `;
-            });
-
-            // Connect to the player
-            player.connect();
-        };
-
-        // Play and Pause functions
-        function play() {
-            // Assuming the player is already initialized and connected
-            const player = Spotify.Player.getInstance();
-            if (player) {
-                player.resume().catch(err => console.error(err));
-            }
-        }
-
-        function pause() {
-            const player = Spotify.Player.getInstance();
-            if (player) {
-                player.pause().catch(err => console.error(err));
-            }
-        }
-    </script>
 </body>
 </html>
