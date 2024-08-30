@@ -23,16 +23,91 @@
             height: 315px;
             border: none;
         }
-        
     </style>
 </head>
 <body>
     <div class="container">
         <h1>Go Brandon Go</h1>
-        <p>Welcome to Go Brandon Go! I would like to document my journey to running my first half marathon! I will be running in the OUC Orlando Half Marathon race on December 7th. I plan on livestreaming this event so that you can follow me along and cheer me on from where ever you are! Still ironing out the logistics. In the meantime, I will be uploading my long runs in the weeks leading up to the race. Thank you for your support! .</p>
+        <p>Welcome to Go Brandon Go! I would like to document my journey to running my first half marathon! I will be running in the OUC Orlando Half Marathon race on December 7th. I plan on livestreaming this event so that you can follow me along and cheer me on from wherever you are! Still ironing out the logistics. In the meantime, I will be uploading my long runs in the weeks leading up to the race. Thank you for your support!</p>
 
         <!-- Embedded YouTube video -->
         <div class="video-container">
             <iframe width="560" height="315" src="https://www.youtube.com/embed/P52StUox2bQ?si=sg-0u2AeZeRZghGT" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
         </div>
+
+        <!-- Button to start Spotify authentication -->
+        <button id="login-button">Login with Spotify</button>
+
+        <!-- Display now playing track -->
+        <div id="track-info">
+            <p>Not authenticated. Please log in to see the current track.</p>
+        </div>
+    </div>
+
+    <script>
+        // Spotify credentials and configuration
+        const clientId = '97e08c2a6e8d4219833b9d913ae47f48';
+        const clientSecret = '75b1d61b460f408297391c8ea1971253';
+        const redirectUri = 'http://localhost:8888/callback'; // Change this to your actual redirect URI
+        const scope = 'user-read-playback-state';
+        const authUrl = `https://accounts.spotify.com/authorize?client_id=${clientId}&response_type=code&redirect_uri=${encodeURIComponent(redirectUri)}&scope=${encodeURIComponent(scope)}`;
+
+        // Redirect to Spotify login
+        document.getElementById('login-button').addEventListener('click', () => {
+            window.location.href = authUrl;
+        });
+
+        // Check for authorization code in URL and fetch access token
+        function getAccessToken() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const code = urlParams.get('code');
+
+            if (code) {
+                fetch('https://accounts.spotify.com/api/token', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded',
+                        'Authorization': 'Basic ' + btoa(clientId + ':' + clientSecret)
+                    },
+                    body: new URLSearchParams({
+                        'grant_type': 'authorization_code',
+                        'code': code,
+                        'redirect_uri': redirectUri
+                    })
+                })
+                .then(response => response.json())
+                .then(data => {
+                    const accessToken = data.access_token;
+                    localStorage.setItem('access_token', accessToken);
+                    fetchNowPlaying(accessToken);
+                });
+            }
+        }
+
+        // Fetch currently playing track
+        function fetchNowPlaying(accessToken) {
+            fetch('https://api.spotify.com/v1/me/player/currently-playing', {
+                headers: {
+                    'Authorization': `Bearer ${accessToken}`
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data && data.item) {
+                    document.getElementById('track-info').innerHTML = `
+                        <h2>Now Playing</h2>
+                        <img src="${data.item.album.images[0].url}" alt="${data.item.name}" width="100">
+                        <p><strong>${data.item.name}</strong> by ${data.item.artists.map(artist => artist.name).join(', ')}</p>
+                    `;
+                } else {
+                    document.getElementById('track-info').innerHTML = '<p>No track playing right now.</p>';
+                }
+            });
+        }
+
+        // Run on page load if code is present in URL
+        getAccessToken();
+    </script>
+</body>
 </html>
+
