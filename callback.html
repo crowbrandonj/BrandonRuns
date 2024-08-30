@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Spotify Callback</title>
+</head>
+<body>
+    <script>
+        // Extract the authorization code from the URL
+        const urlParams = new URLSearchParams(window.location.search);
+        const code = urlParams.get('code');
+
+        if (code) {
+            // Use the authorization code to get an access token
+            fetch('https://accounts.spotify.com/api/token', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                    'Authorization': 'Basic ' + btoa('YOUR_CLIENT_ID:YOUR_CLIENT_SECRET')
+                },
+                body: new URLSearchParams({
+                    'grant_type': 'authorization_code',
+                    'code': code,
+                    'redirect_uri': 'https://crowbrandonj.github.io/BrandonRuns/callback'
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                // Store the access token and redirect to the main page
+                localStorage.setItem('access_token', data.access_token);
+                window.location.href = 'https://crowbrandonj.github.io/BrandonRuns/';
+            });
+        }
+    </script>
+</body>
+</html>
