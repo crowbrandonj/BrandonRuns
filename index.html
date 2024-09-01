@@ -26,6 +26,9 @@
         .video-container {
             margin: 20px 0;
         }
+        .live-stream-container {
+            margin: 20px 0;
+        }
         .live-broadcast-placeholder {
             width: 100%;
             height: 315px;
@@ -111,14 +114,16 @@
         
         <p>Welcome to Go Brandon Go! I would like to document my journey to running my first half marathon! I will be running in the OUC Orlando Half Marathon race on December 7th. I plan on livestreaming this event so that you can follow me along and cheer me on from wherever you are! Still ironing out the logistics. In the meantime, I will be uploading my long runs in the weeks leading up to the race. Thank you for your support!</p>
 
-        <!-- Live Broadcast Placeholder -->
-        <div class="live-broadcast-placeholder" id="live-broadcast-placeholder">
-            Live Broadcast Coming Soon!
+        <!-- Live Stream Container -->
+        <div class="live-stream-container" id="live-stream-container">
+            <div class="live-broadcast-placeholder" id="live-broadcast-placeholder">
+                Live Broadcast Coming Soon!
+            </div>
         </div>
 
         <!-- Embedded YouTube video -->
         <div class="video-container" id="video-container">
-            <!-- The iframe will be inserted here -->
+            <iframe width="560" height="315" src="https://www.youtube.com/embed/P52StUox2bQ?si=sg-0u2AeZeRZghGT" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
         </div>
 
         <!-- Spotify Jam Link -->
@@ -138,12 +143,12 @@
                 const data = await response.json();
                 const liveStreamUrl = data.items.length ? `https://www.youtube.com/embed/${data.items[0].id.videoId}?autoplay=1` : null;
 
+                const liveStreamContainer = document.getElementById('live-stream-container');
                 const placeholder = document.getElementById('live-broadcast-placeholder');
-                const videoContainer = document.getElementById('video-container');
 
                 if (liveStreamUrl) {
                     placeholder.style.display = 'none'; // Hide the placeholder
-                    videoContainer.innerHTML = `
+                    liveStreamContainer.innerHTML = `
                         <iframe width="560" height="315" src="${liveStreamUrl}" title="YouTube Live Stream" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
                     `;
                 } else {
