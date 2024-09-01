@@ -112,13 +112,13 @@
         <p>Welcome to Go Brandon Go! I would like to document my journey to running my first half marathon! I will be running in the OUC Orlando Half Marathon race on December 7th. I plan on livestreaming this event so that you can follow me along and cheer me on from wherever you are! Still ironing out the logistics. In the meantime, I will be uploading my long runs in the weeks leading up to the race. Thank you for your support!</p>
 
         <!-- Live Broadcast Placeholder -->
-        <div class="live-broadcast-placeholder">
+        <div class="live-broadcast-placeholder" id="live-broadcast-placeholder">
             Live Broadcast Coming Soon!
         </div>
 
         <!-- Embedded YouTube video -->
-        <div class="video-container">
-            <iframe width="560" height="315" src="https://www.youtube.com/embed/P52StUox2bQ?si=sg-0u2AeZeRZghGT" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
+        <div class="video-container" id="video-container">
+            <!-- The iframe will be inserted here -->
         </div>
 
         <!-- Spotify Jam Link -->
@@ -127,5 +127,38 @@
             <a href="https://spotify.link/HGgm9Y9duMb" target="_blank" rel="noopener noreferrer">Click here to join!</a>
         </div>
     </div>
+    <script>
+        const API_KEY = 'AIzaSyDx3HCEBq_OLAbSgZo3aQdNOMBL7bmLC0w';
+        const CHANNEL_ID = 'UCcxGs0IwqBlPmeWTy2HMktA';
+
+        async function fetchLiveStreamUrl() {
+            const url = `https://www.googleapis.com/youtube/v3/search?key=${API_KEY}&channelId=${CHANNEL_ID}&part=snippet&eventType=live&type=video&order=date`;
+            try {
+                const response = await fetch(url);
+                const data = await response.json();
+                const liveStreamUrl = data.items.length ? `https://www.youtube.com/embed/${data.items[0].id.videoId}?autoplay=1` : null;
+
+                const placeholder = document.getElementById('live-broadcast-placeholder');
+                const videoContainer = document.getElementById('video-container');
+
+                if (liveStreamUrl) {
+                    placeholder.style.display = 'none'; // Hide the placeholder
+                    videoContainer.innerHTML = `
+                        <iframe width="560" height="315" src="${liveStreamUrl}" title="YouTube Live Stream" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
+                    `;
+                } else {
+                    placeholder.innerText = 'No live stream available.';
+                }
+            } catch (error) {
+                console.error('Error fetching live stream URL:', error);
+            }
+        }
+
+        // Poll for live stream updates
+        setInterval(fetchLiveStreamUrl, 60000); // Check every minute
+
+        // Initial load
+        fetchLiveStreamUrl();
+    </script>
 </body>
 </html>
