@@ -22,6 +22,18 @@
             background-color: rgba(255, 255, 255, 0.8); /* Semi-transparent background for readability */
             padding: 20px; /* Adds padding inside the container */
             border-radius: 10px; /* Optional: Adds rounded corners */
+            position: relative; /* Required for absolute positioning of countdown */
+        }
+        .countdown-timer {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background-color: rgba(0, 0, 0, 0.7);
+            color: #fff;
+            padding: 10px;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: bold;
         }
         .video-container {
             margin: 20px 0;
@@ -114,6 +126,9 @@
         
         <p>Welcome to Go Brandon Go! I would like to document my journey to running my first half marathon! I will be running in the OUC Orlando Half Marathon race on December 7th. I plan on livestreaming this event so that you can follow me along and cheer me on from wherever you are! Still ironing out the logistics. In the meantime, I will be uploading my long runs in the weeks leading up to the race. Thank you for your support!</p>
 
+        <!-- Countdown Timer -->
+        <div class="countdown-timer" id="countdown-timer"></div>
+
         <!-- Live Stream Container -->
         <div class="live-stream-container" id="live-stream-container">
             <div class="live-broadcast-placeholder" id="live-broadcast-placeholder">
@@ -136,6 +151,7 @@
         const API_KEY = 'AIzaSyDx3HCEBq_OLAbSgZo3aQdNOMBL7bmLC0w';
         const CHANNEL_ID = 'UCcxGs0IwqBlPmeWTy2HMktA';
         const PLAYLIST_ID = 'PLnrKDCxCOhW4Lv_kEU90C_nVd0GXd3N-M';
+        const MARATHON_DATE = new Date('2024-12-07T00:00:00');
 
         async function fetchLiveStreamUrl() {
             const url = `https://www.googleapis.com/youtube/v3/search?key=${API_KEY}&channelId=${CHANNEL_ID}&part=snippet&eventType=live&type=video&order=date`;
@@ -183,12 +199,22 @@
             }
         }
 
-        // Poll for live stream updates
-        setInterval(fetchLiveStreamUrl, 60000); // Check every minute
+        function updateCountdown() {
+            const now = new Date();
+            const timeDiff = MARATHON_DATE - now;
 
-        // Initial load
-        fetchLiveStreamUrl();
-        fetchPlaylistVideos();
-    </script>
-</body>
-</html>
+            if (timeDiff <= 0) {
+                document.getElementById('countdown-timer').innerHTML = 'The marathon has started!';
+                return;
+            }
+
+            const days = Math.floor(timeDiff / (1000 * 60 * 60 * 24));
+            const hours = Math.floor((timeDiff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+            const minutes = Math.floor((timeDiff % (1000 * 60 * 60)) / (1000 * 60));
+            const seconds = Math.floor((timeDiff % (1000 * 60)) / 1000);
+
+            document.getElementById('countdown-timer').innerHTML = `
+                ${days}d ${hours}h ${minutes}m ${seconds}s
+            `;
+        }
+
