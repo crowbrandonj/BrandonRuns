@@ -121,9 +121,9 @@
             </div>
         </div>
 
-        <!-- Embedded YouTube video -->
-        <div class="video-container" id="video-container">
-            <iframe width="560" height="315" src="https://www.youtube.com/embed/P52StUox2bQ?si=sg-0u2AeZeRZghGT" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
+        <!-- Playlist Videos Container -->
+        <div id="playlist-container">
+            <!-- Playlist videos will be dynamically inserted here -->
         </div>
 
         <!-- Spotify Jam Link -->
@@ -135,6 +135,7 @@
     <script>
         const API_KEY = 'AIzaSyDx3HCEBq_OLAbSgZo3aQdNOMBL7bmLC0w';
         const CHANNEL_ID = 'UCcxGs0IwqBlPmeWTy2HMktA';
+        const PLAYLIST_ID = 'PLnrKDCxCOhW4Lv_kEU90C_nVd0GXd3N-M';
 
         async function fetchLiveStreamUrl() {
             const url = `https://www.googleapis.com/youtube/v3/search?key=${API_KEY}&channelId=${CHANNEL_ID}&part=snippet&eventType=live&type=video&order=date`;
@@ -159,11 +160,35 @@
             }
         }
 
+        async function fetchPlaylistVideos() {
+            const url = `https://www.googleapis.com/youtube/v3/playlistItems?part=snippet&playlistId=${PLAYLIST_ID}&key=${API_KEY}&maxResults=50`;
+            try {
+                const response = await fetch(url);
+                const data = await response.json();
+                const videos = data.items;
+
+                const playlistContainer = document.getElementById('playlist-container');
+                playlistContainer.innerHTML = ''; // Clear any existing content
+
+                videos.forEach(video => {
+                    const videoId = video.snippet.resourceId.videoId;
+                    const videoTitle = video.snippet.title;
+                    const iframe = document.createElement('iframe');
+                    iframe.src = `https://www.youtube.com/embed/${videoId}`;
+                    iframe.title = videoTitle;
+                    playlistContainer.appendChild(iframe);
+                });
+            } catch (error) {
+                console.error('Error fetching playlist videos:', error);
+            }
+        }
+
         // Poll for live stream updates
         setInterval(fetchLiveStreamUrl, 60000); // Check every minute
 
         // Initial load
         fetchLiveStreamUrl();
+        fetchPlaylistVideos();
     </script>
 </body>
 </html>
